@@ -8,6 +8,33 @@ from pages.base_page import BasePage
 from pages.locators import ProductPageLocators
 from pages.basket_page import BasketPage
 
+@pytest.mark.user_test
+class TestUserAddToBasketFromProductPage():
+    @pytest.fixture(autouse=True)
+    def setup(self, browser):
+        link = "http://selenium1py.pythonanywhere.com/en-gb/accounts/login/"
+        register_page = LoginPage(browser, link)
+        register_page.open()
+        email = str(time.time()) + "@fakemail.org"
+        password = "1234abcd123"
+        register_page.register_new_user(email, password)
+        register_page.should_be_authorized_user()
+
+    def test_user_can_add_product_to_basket(self, browser):
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
+        page = ProductPage(browser, link)
+        page.open()
+        page.add_to_basket()
+        page.correct_name_in_basket()
+        page.correct_price_in_basket()
+        time.sleep(1)
+
+    def test_user_cant_see_success_message(self, browser):
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
+        page = ProductPage(browser, link)
+        page.open()
+        page.should_not_be_success_message()
+
 def test_guest_cant_see_product_in_basket_opened_from_product_page(browser):
     link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
     page = ProductPage(browser, link)
